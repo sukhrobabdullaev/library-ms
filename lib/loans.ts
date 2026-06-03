@@ -1,5 +1,9 @@
 export type BorrowCheck = { ok: true } | { ok: false; reason: string };
 
+export function isOverdue(loan: { dueAt: Date; returnedAt: Date | null }): boolean {
+  return loan.returnedAt === null && loan.dueAt < new Date();
+}
+
 export function canBorrow(
   availableCopies: number,
   activeLoansCount: number,

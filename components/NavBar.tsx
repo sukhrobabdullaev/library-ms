@@ -21,7 +21,7 @@ export default function NavBar({ role, name }: { role: Role; name: string }) {
       </Link>
 
       {role === "student" && (
-        <Link href="/student/dashboard" className="text-sm text-gray-600 hover:text-gray-900">
+        <Link href="/student/loans" className="text-sm text-gray-600 hover:text-gray-900">
           My Loans
         </Link>
       )}

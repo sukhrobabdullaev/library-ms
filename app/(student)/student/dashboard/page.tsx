@@ -16,10 +16,13 @@ export default async function StudentDashboard() {
           <p className="font-medium text-gray-900">Browse Catalog</p>
           <p className="text-sm text-gray-500 mt-1">Search and find books</p>
         </Link>
-        <div className="p-4 rounded-lg border border-gray-200 opacity-50">
+        <Link
+          href="/student/loans"
+          className="p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition"
+        >
           <p className="font-medium text-gray-900">My Loans</p>
-          <p className="text-sm text-gray-500 mt-1">Coming soon</p>
-        </div>
+          <p className="text-sm text-gray-500 mt-1">View active loans and history</p>
+        </Link>
       </div>
     </div>
   );

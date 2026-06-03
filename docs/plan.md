@@ -74,13 +74,13 @@ A step is only **done** when its tests pass. Run `vitest run` (unit/integration)
 
 ## Step 4 — Student "My loans"
 
-- [ ] Page listing the student's active loans with due dates
-- [ ] Highlight overdue loans
-- [ ] Show borrowing history (returned loans)
+- [x] Page listing the student's active loans with due dates
+- [x] Highlight overdue loans
+- [x] Show borrowing history (returned loans)
 - **Tests**
-  - [ ] Unit: `isOverdue(loan)` returns true when `due_at < now` and `returned_at` is null
-  - [ ] Integration: `GET /api/loans/mine` returns only the current student's loans
-  - [ ] E2E: overdue loan appears highlighted on the My Loans page; returned loans appear in history
+  - [x] Unit: `isOverdue(loan)` returns true when `due_at < now` and `returned_at` is null
+  - [x] Integration: `GET /api/loans/mine` returns only the current student's loans
+  - [x] E2E: overdue loan appears highlighted on the My Loans page; returned loans appear in history
 
 ---
 

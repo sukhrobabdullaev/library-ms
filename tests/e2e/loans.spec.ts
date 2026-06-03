@@ -112,4 +112,54 @@ test.describe("Borrow and return", () => {
     // Desk page is still accessible (basic smoke check)
     await expect(page.getByRole("heading", { name: "Loans Desk" })).toBeVisible();
   });
+
+  test("My Loans page shows active loans and history after borrow/return", async ({ page }) => {
+    // Log in as student
+    await page.goto("/login");
+    await page.fill('input[name="email"]', "student1@library.dev");
+    await page.fill('input[name="password"]', "password123");
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL("/student/dashboard");
+
+    // Navigate via nav "My Loans" link — should go to /student/loans
+    await page.click("text=My Loans");
+    await expect(page).toHaveURL("/student/loans");
+    await expect(page.getByRole("heading", { name: "My Loans" })).toBeVisible();
+
+    // Go borrow a book that's available
+    await page.goto("/catalog");
+    const bookLink = page.locator('a[href^="/catalog/"]').filter({ hasText: /\d+ available/ }).first();
+    const bookHref = await bookLink.getAttribute("href");
+    await page.goto(bookHref!);
+
+    // Return it first if already borrowed (cleanup from prior run)
+    const returnBtn = page.getByRole("button", { name: "Return Book" });
+    if (await returnBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await returnBtn.click();
+      await page.waitForLoadState("load");
+    }
+
+    // Borrow the book
+    const borrowBtn = page.getByRole("button", { name: "Borrow Book" });
+    await expect(borrowBtn).toBeVisible();
+    await borrowBtn.click();
+    await page.waitForLoadState("load");
+    await expect(page.getByRole("button", { name: "Return Book" })).toBeVisible({ timeout: 8_000 });
+
+    // Check My Loans — active section should list the book
+    await page.goto("/student/loans");
+    await expect(page.getByRole("heading", { name: "My Loans" })).toBeVisible();
+    await expect(page.getByText("Active (1)")).toBeVisible();
+
+    // Return the book (via book detail page)
+    await page.goto(bookHref!);
+    await page.getByRole("button", { name: "Return Book" }).click();
+    await page.waitForLoadState("load");
+    await expect(page.getByRole("button", { name: "Borrow Book" })).toBeVisible({ timeout: 8_000 });
+
+    // Check My Loans — history should now contain the returned loan
+    await page.goto("/student/loans");
+    await expect(page.getByText("Active (0)")).toBeVisible();
+    await expect(page.getByText("History (")).toBeVisible();
+  });
 });
