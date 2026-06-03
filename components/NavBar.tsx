@@ -37,7 +37,16 @@ export default function NavBar({ role, name }: { role: Role; name: string }) {
           <Link href="/staff/loans" className="text-sm text-gray-600 hover:text-gray-900">
             Loans
           </Link>
+          <Link href="/staff/reports" className="text-sm text-gray-600 hover:text-gray-900">
+            Reports
+          </Link>
         </>
+      )}
+
+      {role === "manager" && (
+        <Link href="/staff/rules" className="text-sm text-gray-600 hover:text-gray-900">
+          Rules
+        </Link>
       )}
 
       <div className="ml-auto flex items-center gap-3">

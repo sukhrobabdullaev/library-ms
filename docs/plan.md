@@ -104,15 +104,15 @@ A step is only **done** when its tests pass. Run `vitest run` (unit/integration)
 
 ## Step 6 — Manager: rules + reports
 
-- [ ] Edit rules: `loan_period_days`, `max_books_per_student`, optional `fine_per_day`
-- [ ] Overdue report (who has what, how many days late)
-- [ ] Most-borrowed books list
+- [x] Edit rules: `loan_period_days`, `max_books_per_student`, optional `fine_per_day`
+- [x] Overdue report (who has what, how many days late)
+- [x] Most-borrowed books list
 - **Tests**
-  - [ ] Integration: `PATCH /api/rules` updates the rules row; student/librarian sessions return 403
-  - [ ] Integration: a new loan after a rules update uses the new `loan_period_days` for `due_at`
-  - [ ] Integration: `GET /api/reports/overdue` returns all loans past their due date
-  - [ ] Integration: `GET /api/reports/popular` returns books ordered by borrow count
-  - [ ] E2E: manager changes `loan_period_days`; a new borrow reflects the new due date
+  - [x] Integration: `PATCH /api/rules` updates the rules row; student/librarian sessions return 403
+  - [x] Integration: a new loan after a rules update uses the new `loan_period_days` for `due_at`
+  - [x] Integration: `GET /api/reports/overdue` returns all loans past their due date
+  - [x] Integration: `GET /api/reports/popular` returns books ordered by borrow count
+  - [x] E2E: manager changes `loan_period_days`; a new borrow reflects the new due date
 
 ---
 
