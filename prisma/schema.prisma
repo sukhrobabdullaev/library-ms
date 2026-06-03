@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  student
+  librarian
+  manager
+}
+
+enum NotificationType {
+  due_soon
+  overdue
+  over_limit
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  role          Role
+  passwordHash  String         @map("password_hash")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  loans         Loan[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Book {
+  id              String   @id @default(cuid())
+  title           String
+  author          String
+  isbn            String?  @unique
+  totalCopies     Int      @map("total_copies")
+  availableCopies Int      @map("available_copies")
+  createdAt       DateTime @default(now()) @map("created_at")
+  loans           Loan[]
+
+  @@map("books")
+}
+
+model Loan {
+  id           String         @id @default(cuid())
+  bookId       String         @map("book_id")
+  userId       String         @map("user_id")
+  borrowedAt   DateTime       @default(now()) @map("borrowed_at")
+  dueAt        DateTime       @map("due_at")
+  returnedAt   DateTime?      @map("returned_at")
+  reminderSent Boolean        @default(false) @map("reminder_sent")
+  book         Book           @relation(fields: [bookId], references: [id])
+  user         User           @relation(fields: [userId], references: [id])
+  notifications Notification[]
+
+  @@map("loans")
+}
+
+model Rules {
+  id                  Int      @id @default(autoincrement())
+  loanPeriodDays      Int      @map("loan_period_days")
+  maxBooksPerStudent  Int      @map("max_books_per_student")
+  finePerDay          Float?   @map("fine_per_day")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("rules")
+}
+
+model Notification {
+  id     String           @id @default(cuid())
+  userId String           @map("user_id")
+  loanId String           @map("loan_id")
+  type   NotificationType
+  sentAt DateTime         @default(now()) @map("sent_at")
+  user   User             @relation(fields: [userId], references: [id])
+  loan   Loan             @relation(fields: [loanId], references: [id])
+
+  @@map("notifications")
+}
