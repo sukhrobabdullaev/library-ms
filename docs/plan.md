@@ -86,19 +86,19 @@ A step is only **done** when its tests pass. Run `vitest run` (unit/integration)
 
 ## Step 5 — Automated reminder emails ⭐
 
-- [ ] Email module wrapping Resend; log to console in dev, send via Resend in prod (verify a sending domain/API key)
-- [ ] Daily scheduled job (Vercel Cron hitting a protected API route, or node-cron)
-- [ ] Job logic, with dedup so the same reminder isn't sent twice:
-  - [ ] Due in 2 days → friendly reminder
-  - [ ] Overdue (1+ days) → "please return"
-  - [ ] Over the book limit → "limit reached"
-- [ ] Mark sent via `loans.reminder_sent` and/or a `notifications` row
+- [x] Email module wrapping Resend; log to console in dev, send via Resend in prod (verify a sending domain/API key)
+- [x] Daily scheduled job (Vercel Cron hitting a protected API route, or node-cron)
+- [x] Job logic, with dedup so the same reminder isn't sent twice:
+  - [x] Due in 2 days → friendly reminder
+  - [x] Overdue (1+ days) → "please return"
+  - [x] Over the book limit → "limit reached"
+- [x] Mark sent via `loans.reminder_sent` and/or a `notifications` row
 - **Tests**
-  - [ ] Unit: reminder-selection logic picks the correct email type for each scenario (due-soon / overdue / over-limit)
-  - [ ] Unit: a loan with `reminder_sent = true` is excluded from the send list
-  - [ ] Integration: `POST /api/cron/reminders` sends an email for an overdue loan and writes a `notifications` row
-  - [ ] Integration: calling the cron route a second time does **not** create a duplicate `notifications` row (dedup check)
-  - [ ] Integration: cron route returns 401 when called without the cron secret header
+  - [x] Unit: reminder-selection logic picks the correct email type for each scenario (due-soon / overdue / over-limit)
+  - [x] Unit: a loan with `reminder_sent = true` is excluded from the send list
+  - [x] Integration: `POST /api/cron/reminders` sends an email for an overdue loan and writes a `notifications` row
+  - [x] Integration: calling the cron route a second time does **not** create a duplicate `notifications` row (dedup check)
+  - [x] Integration: cron route returns 401 when called without the cron secret header
 
 ---
 

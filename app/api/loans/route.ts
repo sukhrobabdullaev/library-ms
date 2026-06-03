@@ -35,9 +35,14 @@ export async function POST(req: NextRequest) {
   if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
   if (!rules) return NextResponse.json({ error: "Rules not configured" }, { status: 500 });
 
-  const activeLoansCount = await db.loan.count({
-    where: { userId: targetUserId, returnedAt: null },
-  });
+  const [activeLoansCount, existingLoan] = await Promise.all([
+    db.loan.count({ where: { userId: targetUserId, returnedAt: null } }),
+    db.loan.findFirst({ where: { bookId, userId: targetUserId, returnedAt: null } }),
+  ]);
+
+  if (existingLoan) {
+    return NextResponse.json({ error: "Already borrowed this book" }, { status: 409 });
+  }
 
   const check = canBorrow(book.availableCopies, activeLoansCount, rules.maxBooksPerStudent);
   if (!check.ok) {

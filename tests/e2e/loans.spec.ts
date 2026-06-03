@@ -1,6 +1,17 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
+
+// Return every active loan for the currently logged-in student via the API,
+// so accumulated state from prior test runs doesn't interfere.
+async function clearMyLoans(page: Page) {
+  const resp = await page.request.get("/api/loans/mine");
+  if (!resp.ok()) return;
+  const { activeLoans } = await resp.json();
+  for (const loan of activeLoans) {
+    await page.request.post(`/api/loans/${loan.id}/return`);
+  }
+}
 
 test.describe("Borrow and return", () => {
   test("student borrows a book; available count drops; student returns it; count recovers", async ({
@@ -13,7 +24,10 @@ test.describe("Borrow and return", () => {
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL("/student/dashboard");
 
-    // Go to catalog — pick first book that shows available copies (green "X available" badge)
+    // Return all leftover loans from prior runs
+    await clearMyLoans(page);
+
+    // Go to catalog — pick first book that shows available copies
     await page.goto("/catalog");
     const bookLink = page.locator('a[href^="/catalog/"]').filter({ hasText: /\d+ available/ }).first();
     await expect(bookLink).toBeVisible();
@@ -22,13 +36,6 @@ test.describe("Borrow and return", () => {
 
     const returnBtnLocator = page.getByRole("button", { name: "Return Book" });
     const borrowBtnLocator = page.getByRole("button", { name: "Borrow Book" });
-
-    // If student already has an active loan from a previous run, return it first
-    if (await returnBtnLocator.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await returnBtnLocator.click();
-      await page.waitForLoadState("load");
-      await expect(borrowBtnLocator).toBeVisible({ timeout: 10_000 });
-    }
 
     // Read the available count before borrowing
     const availableSpan = page
@@ -85,12 +92,6 @@ test.describe("Borrow and return", () => {
     // Select the first available book option (index 1, skipping "Select book...")
     await page.locator('select').nth(1).selectOption({ index: 1 });
 
-    const selectedStudentText = await page
-      .locator('select')
-      .first()
-      .locator("option:checked")
-      .textContent();
-
     await page.click('button[type="submit"]');
 
     // Wait for success or error (error if already borrowed — that's fine for this test's scope)
@@ -121,6 +122,9 @@ test.describe("Borrow and return", () => {
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL("/student/dashboard");
 
+    // Return all leftover loans from prior runs so the active count is predictable
+    await clearMyLoans(page);
+
     // Navigate via nav "My Loans" link — should go to /student/loans
     await page.click("text=My Loans");
     await expect(page).toHaveURL("/student/loans");
@@ -131,13 +135,6 @@ test.describe("Borrow and return", () => {
     const bookLink = page.locator('a[href^="/catalog/"]').filter({ hasText: /\d+ available/ }).first();
     const bookHref = await bookLink.getAttribute("href");
     await page.goto(bookHref!);
-
-    // Return it first if already borrowed (cleanup from prior run)
-    const returnBtn = page.getByRole("button", { name: "Return Book" });
-    if (await returnBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await returnBtn.click();
-      await page.waitForLoadState("load");
-    }
 
     // Borrow the book
     const borrowBtn = page.getByRole("button", { name: "Borrow Book" });

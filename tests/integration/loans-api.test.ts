@@ -15,7 +15,7 @@ vi.mock("@/lib/db", () => ({
   db: {
     book: { findUnique: vi.fn(), update: vi.fn() },
     rules: { findFirst: vi.fn() },
-    loan: { count: vi.fn(), findUnique: vi.fn(), findMany: vi.fn(), create: vi.fn(), update: vi.fn() },
+    loan: { count: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), findMany: vi.fn(), create: vi.fn(), update: vi.fn() },
     $transaction: vi.fn(),
   },
 }));
